@@ -1,0 +1,125 @@
+#include <iostream>
+#include <vector>
+#include <string>
+#include <map>
+#include <utility> 
+
+using namespace std;
+
+class Transaction {    
+    public:
+    string id;
+    int amount_cents;
+    string type;
+    string category_id;
+    string date;
+    string note;
+};
+
+struct Category {
+    int id;
+    string name;
+};
+
+class TransactionManager {
+
+    public:
+    
+    //Default Ctor
+    TransactionManager(){
+        map_size = 0;
+
+    }
+
+    //Dtor
+    ~TransactionManager(){
+        for(pair<string, Transaction *> pr : transaction_db){
+            delete_Transaction(pr.second);
+        }
+    }
+
+    //Copy Ctor
+
+    //Add Transaction
+    void add_Transaction(){
+
+        Transaction * newT = new Transaction();
+
+        //ID
+        newT->id = "tx_" + to_string(map_size + 1);
+
+        //Amt
+        string amount_raw;
+        cout << "Dollar Amount ex. (12.34) $" ;
+        cin >> amount_raw;
+        newT->amount_cents = clean_amount(amount_raw); //Helper 1
+
+        //Type
+        string type;
+        cout << "What Type of Transaction Is This?" << endl;
+        cout << "1) Expense, 2) Earning, 3) Transfer : " ;
+        cin >> type;
+        type = transfer_type(type); //Helper 2
+        newT->type = type;
+
+        //category_id
+        cout << "Category id: ";
+        getline(cin, newT->category_id);
+
+        //Date
+        cout << "Date (YYYY-MM-DD): ";
+        getline(cin, newT->date);
+
+        //Note
+        cout << "Note: ";
+        getline(cin, newT->note);
+
+        transaction_db.insert(make_pair(newT->id, newT));   
+
+        map_size += 1;
+    }
+
+    //Delete Transaction
+    void delete_Transaction(Transaction * tx){
+        delete tx;
+        map_size -= 1;
+    }
+
+    void list_Transactions(){
+        for(pair<string, Transaction *> pr : transaction_db){
+            cout << endl << "------------------------" << endl;
+            cout << "ID: " << pr.second->id << endl;
+            cout << "Amount (cents): " << pr.second->amount_cents << endl;
+            cout << "Type: " << pr.second->type << endl;
+            cout << "Category ID: " << pr.second->category_id << endl;
+            cout << "Date: " << pr.second->date << endl;
+            cout << "Note: " << pr.second->note << endl;
+            cout << "------------------------" << endl << endl;
+        }
+    }
+
+    private:
+
+    //Main data sctructure for storage of all transactions
+    map<string, Transaction *> transaction_db;
+    int map_size;
+
+    //Helper 1
+    int clean_amount(string raw){
+        double amt = stod(raw);
+        amt *= 100;
+        return amt;
+    }
+
+    //Helper 2
+    string transfer_type(string type){
+        int int_type = stoi(type);
+        if(int_type == 0) return "Expense";
+        if(int_type == 1) return "Earning";
+        if(int_type == 2) return "Transfer";
+        else return "error";
+    }
+
+    
+
+};
