@@ -86,6 +86,7 @@ class TransactionManager {
         map_size -= 1;
     }
 
+    //List Transactions
     void list_Transactions(){
         for(pair<string, Transaction *> pr : transaction_db){
             cout << endl << "------------------------" << endl;
@@ -97,6 +98,42 @@ class TransactionManager {
             cout << "Note: " << pr.second->note << endl;
             cout << "------------------------" << endl << endl;
         }
+    }
+
+    //Modify Transaction
+    void modify_Transaction(){
+        string tx_id;
+        cout << "Enter Transaction ID to Modify: ";
+        get_input(tx_id);
+
+        auto it = transaction_db.find(tx_id);
+        if(it == transaction_db.end()){
+            cout << "Transaction Not Found" << endl;
+            return;
+        }
+
+        Transaction * tx = it->second;
+
+        cout << "Modifying Transaction ID: " << tx->id << endl;
+
+        //Amt
+        string amount_raw;
+        cout << "New Dollar Amount ex. (12.34) $";
+        get_input(amount_raw);
+        tx->amount_cents = clean_amount(amount_raw); //Helper 1
+
+        //Type
+        string type;
+        cout << "What Type of Transaction Is This?" << endl;
+        cout << "1) Expense, 2) Earning, 3) Transfer : ";
+        get_input(type);
+        type = transfer_type(type); //Helper 2
+        tx->type = type;
+
+        //category_id
+        cout << "New Category id: ";
+        get_input(tx->category_id);
+
     }
 
     private:

@@ -45,6 +45,11 @@ int main(){
             continue;
         }
 
+        if(choice == 3){
+            txm.modify_Transaction();
+            continue;
+        }
+
         //Exiting Loop
         if(choice == 4){
             flag = false;
