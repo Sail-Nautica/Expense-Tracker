@@ -51,28 +51,29 @@ class TransactionManager {
         //Amt
         string amount_raw;
         cout << "Dollar Amount ex. (12.34) $" ;
-        cin >> amount_raw;
+        get_input(amount_raw);
         newT->amount_cents = clean_amount(amount_raw); //Helper 1
 
         //Type
         string type;
         cout << "What Type of Transaction Is This?" << endl;
         cout << "1) Expense, 2) Earning, 3) Transfer : " ;
-        cin >> type;
+        get_input(type);
         type = transfer_type(type); //Helper 2
         newT->type = type;
 
         //category_id
         cout << "Category id: ";
-        getline(cin, newT->category_id);
+        get_input(newT->category_id);
+
 
         //Date
         cout << "Date (YYYY-MM-DD): ";
-        getline(cin, newT->date);
+        get_input(newT->date);
 
         //Note
         cout << "Note: ";
-        getline(cin, newT->note);
+        get_input(newT->note);
 
         transaction_db.insert(make_pair(newT->id, newT));   
 
@@ -114,12 +115,21 @@ class TransactionManager {
     //Helper 2
     string transfer_type(string type){
         int int_type = stoi(type);
-        if(int_type == 0) return "Expense";
-        if(int_type == 1) return "Earning";
-        if(int_type == 2) return "Transfer";
+        if(int_type == 1) return "Expense";
+        if(int_type == 2) return "Earning";
+        if(int_type == 3) return "Transfer";
         else return "error";
     }
 
-    
+    template <typename T>
+    void get_input(T &input){
+        while(!(cin >> input)){
+            cin.clear();
+            cin.ignore(10000, '\n');
+            cout << "Invalid Input" << endl;
+        }
+    }
+
+
 
 };
