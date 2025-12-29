@@ -3,6 +3,8 @@
 #include <string>
 #include <map>
 #include <utility> 
+#include <fstream>
+#include <sstream>
 
 using namespace std;
 
@@ -14,11 +16,49 @@ class Transaction {
     string category_id;
     string date;
     string note;
+
+    //Ctor
+    Transaction(){
+        id = "";
+        amount_cents = 0;
+        type = "";
+        category_id = "";
+        date = "";
+        note = "";
+    }
+
+    //Dtor
+    ~Transaction(){}
+
+    //Copy Ctor
+    Transaction(const Transaction & other){
+        if(this == &other) return;
+        id = other.id;
+        amount_cents = other.amount_cents;
+        type = other.type;
+        category_id = other.category_id;
+        date = other.date;
+        note = other.note;
+    }
+
+    //Assignment Operator
+    Transaction & operator=(const Transaction & other){
+        if(this == &other) return *this;
+        id = other.id;
+        amount_cents = other.amount_cents;
+        type = other.type;
+        category_id = other.category_id;
+        date = other.date;
+        note = other.note;
+        return *this;
+    } 
+
 };
 
 struct Category {
     int id;
     string name;
+    
 };
 
 class TransactionManager {
@@ -28,17 +68,73 @@ class TransactionManager {
     //Default Ctor
     TransactionManager(){
         map_size = 0;
-
+        load_transactions("data/transactions.csv");
     }
 
     //Dtor
     ~TransactionManager(){
+
+        save_transactions("data/transactions.csv");
+
         for(pair<string, Transaction *> pr : transaction_db){
             delete_Transaction(pr.second);
         }
     }
 
-    //Copy Ctor
+    //Load From File
+    void load_transactions(string filepath){
+
+        fstream fin;
+        fin.open(filepath, ios::in);
+        if(!fin.is_open()){
+            cout << "Error Opening File" << endl;
+            return;
+        }
+
+        vector<string> row;
+        string line, word, temp;
+
+        while(fin >> line){
+            row.clear();
+
+            stringstream sstream (line);
+
+            while(getline(sstream, word, ',')){
+                row.push_back(word);
+            }
+
+            Transaction * newT = new Transaction();
+            newT->id = row[0];
+            newT->amount_cents = stoi(row[1]);
+            newT->type = row[2];
+            newT->category_id = row[3];
+            newT->date = row[4];
+            newT->note = row[5];
+
+            transaction_db.insert(make_pair(newT->id, newT));
+            map_size += 1;
+        }
+
+    }
+
+    //Upload To File
+    void save_transactions(string filepath){
+        fstream fout;
+        fout.open(filepath, ios::out);
+
+        if(!fout.is_open()){
+            cout << "Error Opening File" << endl;
+            return;
+        }   
+
+        //delete existing content
+        fout << "";
+
+        for(pair<string, Transaction *> pr : transaction_db){
+            Transaction * tx = pr.second;
+            fout << tx->id << "," << tx->amount_cents << "," << tx->type << "," << tx->category_id << "," << tx->date << "," << tx->note << endl;
+        }
+    }
 
     //Add Transaction
     void add_Transaction(){
@@ -80,10 +176,20 @@ class TransactionManager {
         map_size += 1;
     }
 
-    //Delete Transaction
+    //Delete Transaction by Pointer
     void delete_Transaction(Transaction * tx){
         delete tx;
         map_size -= 1;
+    }
+
+    //Delete Transaction by ID
+    void delete_Transaction(string tx_id){
+        auto it = transaction_db.find(tx_id);
+        if(it != transaction_db.end()){
+            delete it->second;
+            transaction_db.erase(it);
+            map_size -= 1;
+        }
     }
 
     //List Transactions
@@ -158,6 +264,7 @@ class TransactionManager {
         else return "error";
     }
 
+    //Input Validation Template
     template <typename T>
     void get_input(T &input){
         while(!(cin >> input)){
