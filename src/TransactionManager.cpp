@@ -139,6 +139,8 @@ class TransactionManager {
     //Add Transaction
     void add_Transaction(){
 
+        cout << "_________________________" << endl;
+
         Transaction * newT = new Transaction();
 
         //ID

@@ -38,6 +38,7 @@ int main(){
     TransactionManager txm;
 
     load_from_file(txm);
+    system("clear");
 
     while(flag){
 
@@ -64,6 +65,7 @@ int main(){
 
         //Edit Transactions
         if(choice == 2){
+            cout << "_________________________" << endl;
             cout << "Select an Option"<< endl;
             cout << "1) Add Transaction" << endl;
             cout << "2) Edit Transactions" << endl;
