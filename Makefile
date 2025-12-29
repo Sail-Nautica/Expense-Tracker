@@ -1,34 +1,21 @@
-# Compiler and flags
+# Makefile
+
+# Compiler
 CXX ?= g++
-CXXFLAGS ?= -std=c++17 -Wall -Wextra -O2
-CPPFLAGS ?=
-LDFLAGS ?=
 
-# Target and directories
-TARGET ?= expense-tracker
-SRC := $(wildcard src/*.cpp)
-BUILD_DIR := build
-BIN_DIR := bin
+# Compiler flags
+CXXFLAGS ?= -std=c++17 -Wall -Werror -pedantic -g -Wno-sign-compare -Wno-comment
 
-# Derived paths
-OBJ := $(patsubst src/%.cpp,$(BUILD_DIR)/%.o,$(SRC))
-BIN := $(BIN_DIR)/$(TARGET)
+etracker.exe: src/main.cpp
+	$(CXX) $(CXXFLAGS) $^ -o $@
 
-.PHONY: all run clean
+.SUFFIXES:
 
-all: $(BIN)
-
-$(BIN): $(OBJ)
-	@mkdir -p $(BIN_DIR)
-	$(CXX) $(OBJ) -o $@ $(LDFLAGS)
-
-$(BUILD_DIR)/%.o: src/%.cpp
-	@mkdir -p $(BUILD_DIR)
-	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c $< -o $@
-
-run: $(BIN)
-	@echo Running $(BIN)...
-	@$(BIN)
+.PHONY: clean
 
 clean:
-	@rm -rf $(BUILD_DIR) $(BIN_DIR)
+	rm -rvf *.out *.exe *.dSYM *.stackdump
+
+# Style check
+CPD ?= /usr/um/pmd-6.0.1/bin/run.sh cpd
+OCLINT ?= /usr/um/oclint-22.02/bin/oclint

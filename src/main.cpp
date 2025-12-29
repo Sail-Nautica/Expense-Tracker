@@ -41,18 +41,18 @@ class TransactionManager {
     //Copy Ctor
 
     //Add Transaction
-    Transaction * add_Transaction(){
+    void add_Transaction(){
 
-        Transaction newT;
+        Transaction * newT = new Transaction();
 
         //ID
-        newT.id = "tx_" + to_string(map_size + 1);
+        newT->id = "tx_" + to_string(map_size + 1);
 
         //Amt
         string amount_raw;
         cout << "Dollar Amount ex. (12.34) $" ;
-        getline(cin, amount_raw);
-        newT.amount_cents = clean_amount(amount_raw); //Helper 1
+        cin >> amount_raw;
+        newT->amount_cents = clean_amount(amount_raw); //Helper 1
 
         //Type
         string type;
@@ -60,27 +60,41 @@ class TransactionManager {
         cout << "1) Expense, 2) Earning, 3) Transfer : " ;
         cin >> type;
         type = transfer_type(type); //Helper 2
-        newT.type = type;
+        newT->type = type;
 
         //category_id
         cout << "Category id: ";
-        getline(cin, newT.category_id);
+        getline(cin, newT->category_id);
 
         //Date
         cout << "Date (YYYY-MM-DD): ";
-        getline(cin, newT.date);
+        getline(cin, newT->date);
 
         //Note
         cout << "Note: ";
-        getline(cin, newT.note);
+        getline(cin, newT->note);
 
-        transaction_db[newT.id] = &newT;
+        transaction_db[newT->id] = newT;
 
+        map_size += 1;
     }
 
     //Delete Transaction
-    Transaction * delete_Transaction(Transaction * tx){
+    void delete_Transaction(Transaction * tx){
         delete tx;
+        map_size -= 1;
+    }
+
+    void list_Transactions(){
+        for(pair<string, Transaction *> pr : transaction_db){
+            cout << "ID: " << pr.second->id << endl;
+            cout << "Amount (cents): " << pr.second->amount_cents << endl;
+            cout << "Type: " << pr.second->type << endl;
+            cout << "Category ID: " << pr.second->category_id << endl;
+            cout << "Date: " << pr.second->date << endl;
+            cout << "Note: " << pr.second->note << endl;
+            cout << "------------------------" << endl;
+        }
     }
 
 
@@ -141,7 +155,23 @@ int main(){
         //Adding Transaction
         if(choice == 1){
             txm.add_Transaction();
+            continue;
         }
+
+        //Listing Transactions
+        if(choice == 2){
+            txm.list_Transactions();
+            continue;
+        }
+
+        //Exiting Loop
+        if(choice == 4){
+            flag = false;
+        }
+
+
+
+
         
 
 
