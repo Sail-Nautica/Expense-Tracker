@@ -70,6 +70,9 @@ int main(){
             cout << "1) Add Transaction" << endl;
             cout << "2) Edit Transactions" << endl;
             cout << "3) Delete Transactions" << endl;
+            cout << "4) Back to Main Menu" << endl;
+            cout << "_________________________" << endl;
+            cout << "Choice: ";
 
             int tx_choice;
             get_input(tx_choice);
@@ -85,6 +88,9 @@ int main(){
                 cout << "Enter Transaction ID to Delete: ";
                 get_input(tx_id);
                 txm.delete_Transaction(tx_id);
+            }
+            if(tx_choice == 4){
+                system("clear");
             }
 
             continue;
@@ -104,13 +110,14 @@ int main(){
             save_to_file(txm);
         }
 
+        system("clear");
 
-
+        //Invalid Choice
+        if(choice < 1 || choice > 4){
+            cout << "Invalid Choice, Try Again" << endl;
+        }
 
         
-
-
-
 
     }
 
