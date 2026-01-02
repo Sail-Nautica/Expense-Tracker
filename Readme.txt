@@ -19,7 +19,9 @@ Build an app to help me
 - Summarize Spending/Earning
 - Create and View Budgets
 
-Design Specifications for Minimal Viable Product:
+
+
+Design Specifications for Minimal Viable Product: aka v1.0
 
 Transactions
 - Add Transactions w/
@@ -32,10 +34,6 @@ Transactions
 - Edit Transaction
 - Delete Transaction
 - List Transactions w/ Sorting
-
-Categories
-- Default List w/ Food, Transport, Online Spending
-- Add/Edit/Delete Categories
 
 Views
 - All Transaction View w/
@@ -73,10 +71,6 @@ Transaction
 - note              (string)
 - merchant          (string)
 - account_id        (optional int)
-
-Category
-- id                (UUID)
-- Name              (String)
 
 Budgets
 - id                (UUID)

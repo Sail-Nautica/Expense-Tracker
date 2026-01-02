@@ -1,6 +1,6 @@
-tx_1,1234,Expense,1,2025-12-1,Arbys
+tx_1,1234,Expense,1,2025-12-01,Arbys
 tx_10,4566,Expense,3,2025-12-19,null
-tx_11,3345,Earning,1,2025-12-1,null
+tx_11,3345,Earning,1,2025-12-01,null
 tx_12,2234,Expense,2,2025-11-12,null
 tx_13,7788,Expense,3,2025-12-13,null
 tx_14,8899,Expense,4,2025-12-15,null
@@ -10,7 +10,7 @@ tx_17,6767,Earning,3,2025-12-16,null
 tx_18,1122,Earning,1,2025-12-17,null
 tx_2,1020,Earning,2,2025-11-12,Arbys
 tx_3,3511,Expense,3,2025-12-13,Arbys
-tx_37,12312,Expense,1,2025-12-2,food
+tx_37,12312,Expense,1,2025-12-02,food
 tx_4,3456,Expense,4,2025-12-15,Arbys
 tx_5,5778,Earning,1,2025-12-15,Arbys
 tx_6,5789,Expense,2,2025-12-15,Arbys

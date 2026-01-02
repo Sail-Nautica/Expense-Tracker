@@ -5,6 +5,10 @@
 #include <utility> 
 #include <fstream>
 #include <sstream>
+#include <format>
+#include <string>
+#include <locale>
+#include <algorithm>
 
 using namespace std;
 
@@ -53,6 +57,21 @@ class Transaction {
         return *this;
     } 
 
+    //Keyword Search with and logic
+    bool contains_keyword_list(const vector<string> & keyword){
+        bool flag = false;
+        for(const string & k : keyword){
+            if(contains_keyword(k)){
+                flag = true;
+            }
+            else {
+                flag = false;
+            }
+        }
+        return flag;
+    }
+
+    //Keyword Search for keywords
     bool contains_keyword(const string & keyword){
         if(id.find(keyword) != string::npos) return true;
         if(type.find(keyword) != string::npos) return true;
@@ -71,20 +90,19 @@ struct Category {
 
 class sortType {
     public:
-    sortType(string choice, map<string, Transaction *> &db) :  sort_choice(choice) , print_db(db){}
+    sortType(string choice, map<string, Transaction *> &db) :  sort_choice(choice) , db(db){}
 
     bool operator()(string d1 , string d2){
         if(sort_choice == "date") 
-            cout << print_db[d1]->date << " " << print_db[d2]->date << " " << (print_db[d1]->date < print_db[d2]->date  ) << endl;
-            return print_db[d1]->date < print_db[d2]->date;
+            return db[d1]->date < db[d2]->date;
         if(sort_choice == "amount_cents")  
-            return print_db[d1]->amount_cents > print_db[d2]->amount_cents;
+            return db[d1]->amount_cents > db[d2]->amount_cents;
         return false;
     }
 
     private:
     string sort_choice;
-    map<string, Transaction *> &print_db;
+    map<string, Transaction *> &db;
 };
 
 class TransactionManager {
@@ -234,10 +252,8 @@ class TransactionManager {
         //Get Unsorted IDs
         vector<string> id_list = get_transaction_ids();
 
-        //Sorting Sorting Logic Here
+        //Sort IDs
         if(sort_choice != ""){
-
-            cout << "here" << endl;
 
             //Validate Sort Choice
             if(sort_choice != "date" && sort_choice != "amount_cents"){
@@ -250,37 +266,22 @@ class TransactionManager {
                 return sorter(d1, d2);
             });
 
-            //Reorder the map based on sorted IDs
-            map<string, Transaction *> sorted_map;
-            for(string id : id_list){
-                sorted_map.insert(make_pair(id, transaction_db[id]));
-            }
-            transaction_db = sorted_map;   
-
         }
 
         //Display Transactions
         cout << "_________________________" << endl;
-        for(pair<string, Transaction *> pr : transaction_db){
+        for(string id : id_list){
+            pair<string, Transaction *> pr = make_pair(id, print_db[id]);
             //Filter by not printing if filter_list is not empty & transaction does not match any filter
             if(!filter_list.empty()){
                 bool match = false;
-                for(string filter : filter_list){
-                    if(pr.second->contains_keyword(filter)){
-                        match = true;
-                        break;
-                    }
+                if(pr.second->contains_keyword_list(filter_list)){
+                    match = true;
                 }
-                if(!match) continue; 
+                if(!match) continue;
             }
-            Transaction * tx = pr.second;
-            cout << "ID: " << tx->id << " \t| Amount (cents): " << tx->amount_cents << " \t| Type: " << tx->type << " \t| Category ID: " << tx->category_id << " \t| Date: " << tx->date << " \t| Note: " << tx->note << endl;
-        }   
-    }
-
-    // List Transactions Filtered
-    void list_Transactions_filtered(string sort_choice, vector<string> filter_list){
-
+            cout << "ID: " << pr.second->id << " \t| Amount: " << format_amount(pr.second->amount_cents) << " \t| Type: " << pr.second->type << " \t| Category ID: " << pr.second->category_id << " \t| Date: " << pr.second->date << " \t| Note: " << pr.second->note << endl;
+        }
     }
 
     //Modify Transaction
@@ -319,6 +320,7 @@ class TransactionManager {
 
     }
 
+    //Get Transaction IDs
     vector <string> get_transaction_ids(){
         vector<string> ids;
         for(pair<string, Transaction *> pr : transaction_db){
@@ -359,6 +361,15 @@ class TransactionManager {
         }
     }
 
+    //Format Amount Helper
+    string format_amount(int amount_cents){
+        double amount = (double)amount_cents / 100.0;
+
+        ostringstream oss;
+
+        oss << fixed << setprecision(2) << "$" << amount;
+        return oss.str();
+    };
 
 
 };
