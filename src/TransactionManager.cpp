@@ -53,12 +53,38 @@ class Transaction {
         return *this;
     } 
 
+    bool contains_keyword(const string & keyword){
+        if(id.find(keyword) != string::npos) return true;
+        if(type.find(keyword) != string::npos) return true;
+        if(category_id.find(keyword) != string::npos) return true;
+        if(date.find(keyword) != string::npos) return true;
+        if(note.find(keyword) != string::npos) return true;
+        return false;
+    }
 };
 
 struct Category {
     int id;
     string name;
     
+};
+
+class sortType {
+    public:
+    sortType(string choice, map<string, Transaction *> &db) :  sort_choice(choice) , print_db(db){}
+
+    bool operator()(string d1 , string d2){
+        if(sort_choice == "date") 
+            cout << print_db[d1]->date << " " << print_db[d2]->date << " " << (print_db[d1]->date < print_db[d2]->date  ) << endl;
+            return print_db[d1]->date < print_db[d2]->date;
+        if(sort_choice == "amount_cents")  
+            return print_db[d1]->amount_cents > print_db[d2]->amount_cents;
+        return false;
+    }
+
+    private:
+    string sort_choice;
+    map<string, Transaction *> &print_db;
 };
 
 class TransactionManager {
@@ -195,17 +221,66 @@ class TransactionManager {
     }
 
     //List Transactions
-    void list_Transactions(){
-        for(pair<string, Transaction *> pr : transaction_db){
-            cout << endl << "------------------------" << endl;
-            cout << "ID: " << pr.second->id << endl;
-            cout << "Amount (cents): " << pr.second->amount_cents << endl;
-            cout << "Type: " << pr.second->type << endl;
-            cout << "Category ID: " << pr.second->category_id << endl;
-            cout << "Date: " << pr.second->date << endl;
-            cout << "Note: " << pr.second->note << endl;
-            cout << "------------------------" << endl << endl;
+    void list_Transactions_default(string sort_choice, vector<string> filter_list){
+
+        //Check if DB is empty
+        if(transaction_db.size() == 0){
+            cout << "No Transactions to Display" << endl;
+            return;
         }
+
+        map<string, Transaction *> print_db = transaction_db; //Make a copy to preserve original data  
+
+        //Get Unsorted IDs
+        vector<string> id_list = get_transaction_ids();
+
+        //Sorting Sorting Logic Here
+        if(sort_choice != ""){
+
+            cout << "here" << endl;
+
+            //Validate Sort Choice
+            if(sort_choice != "date" && sort_choice != "amount_cents"){
+                cout << "Invalid Sort Choice" << endl;
+                return;
+            }
+
+            sortType sorter(sort_choice, print_db);
+            sort(id_list.begin(), id_list.end(), [&](string d1, string d2){
+                return sorter(d1, d2);
+            });
+
+            //Reorder the map based on sorted IDs
+            map<string, Transaction *> sorted_map;
+            for(string id : id_list){
+                sorted_map.insert(make_pair(id, transaction_db[id]));
+            }
+            transaction_db = sorted_map;   
+
+        }
+
+        //Display Transactions
+        cout << "_________________________" << endl;
+        for(pair<string, Transaction *> pr : transaction_db){
+            //Filter by not printing if filter_list is not empty & transaction does not match any filter
+            if(!filter_list.empty()){
+                bool match = false;
+                for(string filter : filter_list){
+                    if(pr.second->contains_keyword(filter)){
+                        match = true;
+                        break;
+                    }
+                }
+                if(!match) continue; 
+            }
+            Transaction * tx = pr.second;
+            cout << "ID: " << tx->id << " \t| Amount (cents): " << tx->amount_cents << " \t| Type: " << tx->type << " \t| Category ID: " << tx->category_id << " \t| Date: " << tx->date << " \t| Note: " << tx->note << endl;
+        }   
+    }
+
+    // List Transactions Filtered
+    void list_Transactions_filtered(string sort_choice, vector<string> filter_list){
+
     }
 
     //Modify Transaction
@@ -242,6 +317,14 @@ class TransactionManager {
         cout << "New Category id: ";
         get_input(tx->category_id);
 
+    }
+
+    vector <string> get_transaction_ids(){
+        vector<string> ids;
+        for(pair<string, Transaction *> pr : transaction_db){
+            ids.push_back(pr.first);
+        }
+        return ids;
     }
 
     private:
