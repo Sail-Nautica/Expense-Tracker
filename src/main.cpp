@@ -30,7 +30,6 @@ void save_to_file(TransactionManager & txm){
     txm.save_transactions(filepath);
 }
 
-
 int main(){
 
     bool main_loop_flag = true;
